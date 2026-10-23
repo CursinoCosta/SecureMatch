@@ -1,0 +1,60 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+\titleformat{\section}{\normalsize\bfseries\uppercase}{}{0em}{}[\vspace{-0.5em}\rule{\textwidth}{0.4pt}\vspace{-0.2em}]
+\titlespacing*{\section}{0pt}{0.8em}{0.3em}
+\setlist{nosep, leftmargin=1.3em, topsep=0.2em}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+    {\small \textbf{Cryptography (2026/2) --- DCC / ICEx / UFMG}}\\[0.15em]
+    {\footnotesize Prof. Jeroen van de Graaf \quad $\bullet$\quad Course Project Proposal}
+    \vspace{0.4em}
+    \hrule height 0.8pt
+    \vspace{0.5em}
+    {\large \textbf{SecureMatch: Configurable Privacy-Preserving Record Linkage\\via Elliptic Curve Diffie-Hellman Private Set Intersection}}
+    \vspace{0.3em}
+\end{center}
+
+\noindent\textbf{1. Project Title:} SecureMatch: Configurable Privacy-Preserving Record Linkage via Elliptic Curve Diffie-Hellman Private Set Intersection\\[0.25em]
+\textbf{2. Team Member:} Mateus Cursino Gomes Costa \quad (\textbf{Student ID / Matrícula:} 2022043191)\\[0.25em]
+\textbf{3. Type of Project:} Programming / Implementation
+
+\section*{4. Abstract}
+Cross-organizational data reconciliation in regulated domains (such as healthcare cohorts, inter-bank fraud detection, and public registry synchronization) frequently requires identifying shared entities across databases without disclosing non-intersecting sensitive records. A common but deeply flawed industry practice relies on exchanging hashed identifiers (e.g., plain SHA-256). Because identifiers such as national IDs (CPF/CNPJ), phone numbers, or organizational codes possess limited entropy, unsalted or salted hashes remain vulnerable to dictionary attacks, precomputed rainbow tables, and GPU-accelerated brute forcing.
+
+This project addresses this challenge by designing and implementing \textbf{SecureMatch}, a two-party \textbf{Private Set Intersection (PSI)} engine based on \textbf{Commutative Diffie-Hellman} cryptography over elliptic curves. Under a semi-honest (honest-but-curious) model, SecureMatch enables two participants to discover intersecting entities without revealing disjoint records. A central design goal is \emph{key flexibility}: rather than hardcoding a single identity attribute, the system will support customizable matching schemas. The parties can agree on standardized identifiers (such as CPF, CNPJ, or normalized phone numbers with geographic region) or define arbitrary composite patterns and internal keys tailored to a given exchange.
+
+A primary technical step in the project will be the evaluation and selection of the underlying cryptographic primitives---specifically comparing candidate elliptic curves (such as \texttt{secp256k1} and \texttt{Curve25519}) and assessing appropriate hash-to-curve mappings for security and efficiency. Coupled with a configurable normalization step (handling case, Unicode canonicalization, and format standardizations to prevent false negatives), the protocol leverages the commutative property of exponentiation ($a \cdot b \cdot P = b \cdot a \cdot P$) to achieve linear computational complexity $O(|X| + |Y|)$. This project interests me because it bridges practical tabular data engineering (privacy-preserving equijoins) with foundational cryptographic guarantees, demonstrating how real-world systems can comply with privacy regulations (e.g., LGPD and GDPR) while maintaining performance.
+
+\section*{5. Expected Results and Deliverables}
+By November 18, 2026, the project will deliver:
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Working \& Documented Codebase (GitHub):} A modular Python implementation providing:
+    \begin{itemize}[label=--]
+        \item \emph{Configurable Schema \& Normalization Engine:} Extensible parser supporting custom match keys (standard IDs, composite fields, and domain-specific patterns) alongside canonical data cleaning to prevent hashing mismatches;
+        \item \emph{Cryptographic Primitives Module:} Implementation and evaluation of selected curve parameters, secure random scalar generation, hash-to-curve encoding, and serialized point representations;
+        \item \emph{Protocol Engine \& Transport:} Client/server state machine executing the two-party commutative PSI exchange with random permutations, supporting local memory transport (for algorithmic profiling) and network sockets.
+    \end{itemize}
+    \item \textbf{Empirical Benchmarks:} Performance evaluation measuring end-to-end execution latency, cryptographic computation time, and communication overhead across dataset sizes from $N = 10^2$ to $5 \times 10^4$ records, contrasted with a naive hashing baseline to quantify the practical ``privacy tax''.
+    \item \textbf{Final Report:} A concise report documenting the cryptographic selection rationales, protocol security assumptions (Computational Diffie-Hellman), benchmark analysis, and difficulties encountered.
+    \item \textbf{Presentation Slides \& Result Walkthrough:} Slide deck for the 15--20 minute in-class presentation, accompanied by a presentation of empirical results or a step-by-step recreation of the protocol execution process.
+\end{enumerate}
+
+\end{document}
