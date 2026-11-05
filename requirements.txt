@@ -1,0 +1,9 @@
+# SecureMatch Dependencies
+
+# Core cryptographic operations, protocol state machines, and data pipelines
+# are implemented using Python standard library (hashlib, secrets, unicodedata, asyncio, dataclasses)
+# with zero external dependency requirements for maximum portability.
+
+# Optional development, test runner, and publication-quality chart generation:
+matplotlib>=3.5.0
+pytest>=7.0.0

@@ -41,17 +41,17 @@ Nov 18:          Final Delivery & In-Class Presentation
 ### Phase 0: Research Spike & Technical Foundations (Nov 5 – Nov 7)
 *Objective: Conduct technical trade-off analyses, establish design decisions, and document architectural foundations before writing production code.*
 
-- [ ] **Task 0.1: Elliptic Curve & Library Evaluation Spike**
+- [x] **Task 0.1: Elliptic Curve & Library Evaluation Spike**
   - Compare candidate curves: `secp256k1` (Koblitz, efficient multiplication), `Curve25519` (Montgomery, timing attack resistance), and `NIST P-256`.
   - Evaluate Python runtime performance and cryptographic primitives: Python `cryptography` package vs. specialized bindings vs. optimized finite-field implementation.
   - Document findings and decision rationale in `docs/planing/adr_01_cryptographic_primitives.md`.
-- [ ] **Task 0.2: Hash-to-Curve Algorithm Analysis**
+- [x] **Task 0.2: Hash-to-Curve Algorithm Analysis**
   - Compare Hash-and-Increment (counter-based quadratic residue search via Euler's criterion) vs. RFC 9380 simplified SWU (Straight-line / constant-time).
   - Assess security implications under the Random Oracle Model (ROM) and performance trade-offs in Python.
-- [ ] **Task 0.3: Match Key Specification & Protocol Negotiation Design**
+- [x] **Task 0.3: Match Key Specification & Protocol Negotiation Design**
   - Define declarative schema format (JSON / YAML / lightweight spec) for party agreement on match keys.
   - Specify canonical length-prefixed serialization (CRI) format to guarantee deterministic byte encoding and prevent delimiter injection attacks.
-- [ ] **Task 0.4: Project Scaffolding & Virtual Environment**
+- [x] **Task 0.4: Project Scaffolding & Virtual Environment**
   - Initialize clean repository folder layout (`src/`, `tests/`, `benchmark/`, `docs/`).
   - Setup `requirements.txt` with locked dependencies and `pytest` harness.
 
@@ -206,3 +206,4 @@ Nov 18:          Final Delivery & In-Class Presentation
 - [ ] **Documentation Integrity**
   - All architecture decision records (ADRs) kept in `docs/planing/`.
   - All progress tracked against this execution plan.
+
