@@ -77,3 +77,4 @@ Benchmarked over $100$ trials:
 2. **Hash-to-Curve Method:** **Deterministic Hash-and-Increment with Euler Quadratic Residue Test**.
 3. **Randomness & Scalar Generation:** Cryptographically secure OS entropy (`secrets.randbelow(N)` where $N$ is the curve group order).
 4. **Modularity:** The cryptographic layer will expose a clean interface (`CurvePoint`, `ScalarKey`, `hash_to_curve()`) so alternate curves (such as Curve25519) can be plugged in seamlessly for comparison.
+

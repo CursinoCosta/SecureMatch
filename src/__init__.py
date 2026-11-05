@@ -3,3 +3,4 @@ SecureMatch: Configurable Privacy-Preserving Record Linkage via Commutative ECDH
 """
 
 __version__ = "0.1.0"
+

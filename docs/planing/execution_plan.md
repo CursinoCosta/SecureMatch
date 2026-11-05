@@ -60,16 +60,16 @@ Nov 18:          Final Delivery & In-Class Presentation
 ### Phase 1: Cryptographic Core Engine (Nov 7 – Nov 9)
 *Objective: Implement the mathematical engine, point operations, scalar blinding, and hash-to-point mappings with automated unit verification.*
 
-- [ ] **Task 1.1: Curve Arithmetic & Key Generation**
+- [x] **Task 1.1: Curve Arithmetic & Key Generation**
   - Implement secure scalar generation $k \in \mathbb{Z}_r^*$ using cryptographically secure entropy (`secrets` / OS CSPRNG).
   - Point multiplication routines for single and batch operations.
-- [ ] **Task 1.2: Deterministic Hash-to-Curve Module (`src/crypto/hash_to_curve.py`)**
+- [x] **Task 1.2: Deterministic Hash-to-Curve Module (`src/crypto/hash_to_curve.py`)**
   - Implement deterministic mapping from arbitrary normalized byte strings $\{0,1\}^* \rightarrow E(\mathbb{F}_p)$.
   - Ensure collision resistance and uniform distribution across curve subgroups.
-- [ ] **Task 1.3: Point Serialization & Compression**
+- [x] **Task 1.3: Point Serialization & Compression**
   - Implement standard compressed point serialization (e.g., 33-byte format: prefix byte + 32-byte $x$-coordinate).
   - Implement deserialization and point-on-curve validation checks.
-- [ ] **Task 1.4: Cryptographic Invariant Testing (`tests/test_crypto.py`)**
+- [x] **Task 1.4: Cryptographic Invariant Testing (`tests/test_crypto.py`)**
   - Unit tests verifying:
     - Points lie on the curve: $y^2 \equiv x^3 + ax + b \pmod p$.
     - Commutativity invariant: $a \cdot (b \cdot P) == b \cdot (a \cdot P)$ across random scalars and inputs.

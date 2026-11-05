@@ -124,3 +124,4 @@ Before any cryptographic curve operations occur:
    $$\text{SchemaHash} = \text{SHA-256}(\text{Canonical JSON Representation of Schema})$$
 2. **Server Verification:** The Server verifies that its local input dataset is bound to the identical $\text{SchemaHash}$.
 3. **Mismatch Handling:** If the schemas differ, the Server immediately aborts the connection with a `SCHEMA_MISMATCH_ERROR`, preventing unintended computational load or protocol failure.
+

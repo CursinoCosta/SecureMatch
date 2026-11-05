@@ -7,3 +7,4 @@
 # Optional development, test runner, and publication-quality chart generation:
 matplotlib>=3.5.0
 pytest>=7.0.0
+
