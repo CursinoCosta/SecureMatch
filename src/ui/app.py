@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 SecureMatch — Confidential Record Linkage Application (Streamlit).
 
@@ -33,6 +35,7 @@ from src.data_pipeline.schema import (
     create_internal_id_schema,
     create_phone_region_schema,
 )
+from src.transport.memory_channel import ChannelMetrics
 
 st.set_page_config(
     page_title="SecureMatch — Confidential Record Linkage",
@@ -96,6 +99,14 @@ def load_csv_data(raw_text: str) -> Tuple[List[Dict[str, str]], List[str]]:
     return rows, list(headers)
 
 
+def render_dataframe(data: Any) -> None:
+    """Renders dataframe with stretch width, compatible with modern and legacy Streamlit."""
+    try:
+        st.dataframe(data, width="stretch")
+    except (TypeError, ValueError):
+        st.dataframe(data, use_container_width=True)
+
+
 # ---------------------------------------------------------------------------
 # Top Controls: Global Agreement on Match Key Pattern
 # ---------------------------------------------------------------------------
@@ -157,7 +168,7 @@ with col_party_a:
     st.caption(f"Loaded **{len(rows_a)}** records &bull; Columns: `{', '.join(headers_a[:4])}...`")
 
     with st.expander("👁️ Preview Hospital A Data", expanded=False):
-        st.dataframe(rows_a[:5], use_container_width=True)
+        render_dataframe(rows_a[:5])
 
     st.markdown('<span class="step-badge">Step 2</span> **Map Your Primary Key Column**', unsafe_allow_html=True)
     if not headers_a:
@@ -224,7 +235,7 @@ with col_party_b:
     st.caption(f"Loaded **{len(rows_b)}** records &bull; Columns: `{', '.join(headers_b[:4])}...`")
 
     with st.expander("👁️ Preview Hospital B Data", expanded=False):
-        st.dataframe(rows_b[:5], use_container_width=True)
+        render_dataframe(rows_b[:5])
 
     st.markdown('<span class="step-badge">Step 2</span> **Map Your Primary Key Column**', unsafe_allow_html=True)
     if not headers_b:
@@ -401,7 +412,7 @@ if btn_run:
     with res_col_a:
         st.markdown('<div class="org-header-a">📁 Hospital A: Enriched Database</div>', unsafe_allow_html=True)
         st.caption("Hospital A's private data, tagged with match status against Hospital B.")
-        st.dataframe(enriched_a, use_container_width=True)
+        render_dataframe(enriched_a)
 
         st.markdown("**Export Hospital A Data:**")
 
@@ -440,7 +451,7 @@ if btn_run:
     with res_col_b:
         st.markdown('<div class="org-header-b">📁 Hospital B: Enriched Database</div>', unsafe_allow_html=True)
         st.caption("Hospital B's private data, tagged with match status against Hospital A.")
-        st.dataframe(enriched_b, use_container_width=True)
+        render_dataframe(enriched_b)
 
         st.markdown("**Export Hospital B Data:**")
 
