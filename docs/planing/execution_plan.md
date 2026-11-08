@@ -81,20 +81,20 @@ Nov 18:          Final Delivery & In-Class Presentation
 ### Phase 2: Configurable Schema & Normalization Pipeline (Nov 9 – Nov 11)
 *Objective: Build the identity engineering layer that parses custom match keys, normalizes records, and outputs canonical byte representations.*
 
-- [ ] **Task 2.1: Canonical Record Identifier (CRI) Engine (`src/data_pipeline/schema.py`)**
+- [x] **Task 2.1: Canonical Record Identifier (CRI) Engine (`src/data_pipeline/schema.py`)**
   - Implement length-prefixed deterministic string serializer:  
     `field_1:length_1:value_1|field_2:length_2:value_2` (with sorted keys for canonical order).
   - Guard against delimiter manipulation (e.g., ensuring `name="a|b"` does not inject fake attributes).
-- [ ] **Task 2.2: Configurable Field Normalizers (`src/data_pipeline/normalizers.py`)**
+- [x] **Task 2.2: Configurable Field Normalizers (`src/data_pipeline/normalizers.py`)**
   - Text normalization: Unicode NFKD decomposition, diacritic stripping, case folding, and whitespace collapsing.
   - Pre-built standard formatters:
-    - Brazilian CPF / CNPJ: punctuation stripping, 11/14 digit validation, checksum verification.
+    - Brazilian CPF / CNPJ: punctuation stripping, 11/14 digit validation, checksum verification (supporting both numeric and modern alphanumeric CNPJ).
     - Phone numbers: country code standardization, region/area code tagging.
     - Internal IDs / alphanumeric keys: padding, trimming, casing rules.
   - Custom composite keys: support multi-attribute combinations (e.g., `BirthDate + PostalCode + LastName`).
-- [ ] **Task 2.3: Ingestion Adapters (`src/data_pipeline/ingestion.py`)**
+- [x] **Task 2.3: Ingestion Adapters (`src/data_pipeline/ingestion.py`)**
   - Streaming readers for common tabular data formats (CSV, JSON, Python dictionaries) converting records to normalized byte arrays.
-- [ ] **Task 2.4: Pipeline Unit Tests (`tests/test_pipeline.py`)**
+- [x] **Task 2.4: Pipeline Unit Tests (`tests/test_pipeline.py`)**
   - Test dirty-data resilience: verify that varying encodings, accents, and punctuation normalize to identical bytes.
   - Test schema negotiation and rejection of incompatible schemas between parties.
 

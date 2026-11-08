@@ -27,3 +27,4 @@ def hash_and_blind(scalar: int, record_bytes: bytes) -> Point:
 def hash_and_blind_batch(scalar: int, records: Iterable[bytes]) -> List[Point]:
     """Maps and blinds an iterable of byte records."""
     return [hash_and_blind(scalar, rec) for rec in records]
+

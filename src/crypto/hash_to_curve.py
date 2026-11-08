@@ -93,3 +93,4 @@ def batch_hash_to_curve(
 ) -> List[Point]:
     """Maps a sequence of byte records to curve points in batch."""
     return [hash_to_curve(rec, domain_tag) for rec in records]
+
