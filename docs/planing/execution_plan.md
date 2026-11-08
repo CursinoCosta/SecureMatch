@@ -30,7 +30,8 @@ Nov 07 — Nov 09: Phase 1 — Cryptographic Core & Mathematical Foundations
 Nov 09 — Nov 11: Phase 2 — Configurable Schema Engine & Normalization Pipeline
 Nov 11 — Nov 13: Phase 3 — Protocol State Machines & Dual-Transport Layer
 Nov 13 — Nov 15: Phase 4 — Empirical Benchmarking & Privacy-Tax Analysis
-Nov 15 — Nov 17: Phase 5 — CLI Tooling, Presentation Slides & Final Report
+Nov 15 — Nov 16: Phase 5 — Interactive Streamlit UI & Visual Demonstration Suite
+Nov 16 — Nov 17: Phase 6 — CLI Tooling, Presentation Slides & Final Report
 Nov 18:          Final Delivery & In-Class Presentation
 ```
 
@@ -150,16 +151,36 @@ Nov 18:          Final Delivery & In-Class Presentation
 
 ---
 
-### Phase 5: CLI, Presentation Slides & Final Report (Nov 15 – Nov 18)
+### Phase 5: Interactive Streamlit UI & Visual Demonstration (Nov 15 – Nov 16)
+*Objective: Build an intuitive, accessible web interface to make SecureMatch interactive, demonstrate protocol steps for the class presentation, and visually explore the privacy tax.*
+
+- [ ] **Task 5.1: Streamlit Dashboard Scaffolding (`src/ui/app.py`)**
+  - Multi-tab layout: Interactive PSI Playground, Step-by-Step Educational Walkthrough, Schema Designer, and Live Benchmark Visualizer.
+- [ ] **Task 5.2: Interactive PSI Playground Tab**
+  - Select or configure schema (CPF, CNPJ numeric/alphanumeric, Phone + Region, custom).
+  - Load pre-built sample datasets or upload custom CSVs for Party A (Client) and Party B (Server).
+  - Execute matching and visually inspect:
+    - Normalization & CRI inspection.
+    - Compressed curve points and blinded coordinates.
+    - Overlap highlighting without exposing disjoint rows.
+- [ ] **Task 5.3: Step-by-Step Educational Walkthrough Tab**
+  - Interactive stage-by-stage visualization of the commutative double-lock:
+    $a \cdot (b \cdot P) == b \cdot (a \cdot P)$.
+  - Explains what an eavesdropper sees vs. what client and server learn at each step.
+- [ ] **Task 5.4: Live Benchmark & Privacy Tax Visualizer Tab**
+  - Run real-time performance and scalability benchmarks on synthetic datasets.
+  - Interactive plots showing Latency vs. Scale and Wire Bandwidth vs. Scale compared to naive SHA-256.
+
+### Phase 6: CLI, Presentation Slides & Final Report (Nov 16 – Nov 18)
 *Objective: Package the project into an intuitive CLI tool, compile the formal academic report, and create the presentation slide deck.*
 
-- [ ] **Task 5.1: Unified Command Line Interface (`src/cli.py`)**
+- [ ] **Task 6.1: Unified Command Line Interface (`src/cli.py`)**
   - CLI commands:
     - `securematch server --host 0.0.0.0 --port 9000 --data server.csv --schema cpf`
     - `securematch client --host 127.0.0.1 --port 9000 --data client.csv --schema cpf`
     - `securematch benchmark --scale 1000,5000,10000 --output-dir ./results`
-    - `securematch demo --step-by-step`: Interactive step-by-step recreation of each mathematical round for class presentation.
-- [ ] **Task 5.2: Final Project Report (`docs/report/report.tex`)**
+    - `securematch ui`: Launch the interactive Streamlit dashboard.
+- [ ] **Task 6.2: Final Project Report (`docs/report/report.tex`)**
   - Structure:
     1. Introduction & Regulatory Motivation (LGPD/GDPR, low-entropy vulnerability).
     2. Cryptographic Formulation & Security Reductions under CDH.
@@ -167,14 +188,14 @@ Nov 18:          Final Delivery & In-Class Presentation
     4. Experimental Benchmark Results & Privacy-Tax Analysis.
     5. Retrospective: Difficulties encountered, deviations from initial plan, and lessons learned.
   - Compile to `docs/report/report.pdf`.
-- [ ] **Task 5.3: Presentation Slide Deck (`docs/presentation/`)**
+- [ ] **Task 6.3: Presentation Slide Deck (`docs/presentation/`)**
   - 15–20 minute presentation deck covering:
     - Motivation & the Naive Hash Trap.
     - Mathematical mechanism: Commutative ECDH and Hash-to-Curve.
     - Configurable matching schemas in practice.
     - Benchmark results, charts, and linear scaling analysis.
-    - Step-by-step protocol demonstration walkthrough.
-- [ ] **Task 5.4: Final Packaging & Code Quality Review**
+    - Live Streamlit visual walkthrough.
+- [ ] **Task 6.4: Final Packaging & Code Quality Review**
   - Verify clean repository structure, docstrings, reproduction instructions in `README.md`.
   - Staging and local commit ready for user's push.
 
