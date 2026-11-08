@@ -103,23 +103,23 @@ Nov 18:          Final Delivery & In-Class Presentation
 ### Phase 3: Protocol State Machines & Dual-Transport Layer (Nov 11 – Nov 13)
 *Objective: Implement the interactive 2-round PSI protocol state machine with random permutation and pluggable transport channels.*
 
-- [ ] **Task 3.1: Protocol Framing & Message Envelopes (`src/protocol/messages.py`)**
+- [x] **Task 3.1: Protocol Framing & Message Envelopes (`src/protocol/messages.py`)**
   - Binary/packed message format for point exchanges, schema handshake, and metadata.
-- [ ] **Task 3.2: Party State Machines (`src/protocol/party_client.py`, `party_server.py`)**
+- [x] **Task 3.2: Party State Machines (`src/protocol/party_client.py`, `party_server.py`)**
   - **Client Round 1:** Blinds set $X$ with scalar $a \rightarrow \{a \cdot H(x_i)\}$.
   - **Server Round 2:**
     - Blinds incoming client points with scalar $b \rightarrow \{b \cdot (a \cdot H(x_i))\}$.
-    - Applies cryptographically secure random permutation (Fisher-Yates shuffle) to eliminate index/positional leakage.
+    - Applies cryptographically secure random permutation (Fisher-Yates shuffle) to eliminate index/positional leakage on server points.
     - Blinds own set $Y$ with scalar $b \rightarrow \{b \cdot H(y_j)\}$.
-    - Transmits shuffled doubly-encrypted points and singly-encrypted server points to Client.
+    - Transmits doubly-encrypted points and shuffled singly-encrypted server points to Client.
   - **Client Round 3:**
     - Computes $a \cdot (b \cdot H(y_j))$.
     - Computes set intersection in $O(|X| + |Y|)$ via hash set lookup.
     - Maps matched points back to original local plaintext records.
-- [ ] **Task 3.3: Pluggable Transport Layer (`src/transport/`)**
+- [x] **Task 3.3: Pluggable Transport Layer (`src/transport/`)**
   - `memory_channel.py`: Direct in-memory queue transport (bypasses OS networking to measure pure algorithmic CPU latency).
   - `socket_transport.py`: Asynchronous TCP client-server sockets with real network emulation and byte counters.
-- [ ] **Task 3.4: End-to-End Integration Tests (`tests/test_protocol_e2e.py`)**
+- [x] **Task 3.4: End-to-End Integration Tests (`tests/test_protocol_e2e.py`)**
   - Assert that `client.compute_intersection() == set(client_raw) & set(server_raw)` across disjoint, identical, and partial-overlap datasets.
   - Test security properties: verify that server learns 0 information about client inputs.
 
