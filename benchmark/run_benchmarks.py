@@ -55,6 +55,19 @@ from benchmark.baseline_naive import naive_sha256_psi
 DEFAULT_OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "results", "metrics.json")
 
 
+def make_unique_cpf_digits(idx: int) -> str:
+    """Generates a guaranteed collision-free valid 11-digit CPF from an integer index."""
+    base_int = idx % 1_000_000_000
+    base_str = f"{base_int:09d}"
+    s1 = sum(int(base_str[i]) * (10 - i) for i in range(9))
+    r1 = (s1 * 10) % 11
+    d1 = 0 if r1 == 10 else r1
+    s2 = sum(int(base_str[i]) * (11 - i) for i in range(9)) + (d1 * 2)
+    r2 = (s2 * 10) % 11
+    d2 = 0 if r2 == 10 else r2
+    return f"{base_str}{d1}{d2}"
+
+
 def make_benchmark_pair(
     size_a: int,
     size_b: int,
@@ -64,13 +77,14 @@ def make_benchmark_pair(
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[str]]:
     """
     Generates controlled benchmark pairs with exact overlap and configurable noise.
+    Uses collision-free unique CPFs to avoid Birthday Paradox collisions on large scales.
     Returns (db_a, db_b, shared_cpf_keys).
     """
     rng = random.Random(seed)
     total_unique = size_a + size_b - overlap_count
 
-    # Generate unique valid CPFs
-    all_cpfs = [generate_valid_cpf_digits(seed * 10000 + i) for i in range(total_unique)]
+    # Strictly collision-free valid CPFs
+    all_cpfs = [make_unique_cpf_digits(seed * 1_000_000 + i) for i in range(total_unique)]
     shared_keys = all_cpfs[:overlap_count]
     only_a_keys = all_cpfs[overlap_count:size_a]
     only_b_keys = all_cpfs[size_a:total_unique]

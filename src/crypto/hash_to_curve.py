@@ -87,10 +87,34 @@ def hash_to_curve_with_stats(
         counter += 1
 
 
+def _parallel_hash_worker(chunk: List[bytes], domain_tag: bytes) -> List[Point]:
+    return [hash_to_curve(rec, domain_tag) for rec in chunk]
+
+
 def batch_hash_to_curve(
     records: Iterable[bytes],
     domain_tag: bytes = DEFAULT_DOMAIN_TAG,
 ) -> List[Point]:
-    """Maps a sequence of byte records to curve points in batch."""
-    return [hash_to_curve(rec, domain_tag) for rec in records]
+    """
+    Maps a sequence of byte records to curve points in batch.
+    Automatically leverages multi-core parallel processing for large batches (N >= 500).
+    """
+    recs = list(records)
+    n = len(recs)
+    if n < 500:
+        return [hash_to_curve(rec, domain_tag) for rec in recs]
+
+    import os
+    import multiprocessing as mp
+    cpu_count = min(4, os.cpu_count() or 1)
+    chunk_size = (n + cpu_count - 1) // cpu_count
+    chunks = [recs[i:i + chunk_size] for i in range(0, n, chunk_size)]
+
+    with mp.Pool(processes=cpu_count) as pool:
+        chunk_results = pool.starmap(_parallel_hash_worker, [(c, domain_tag) for c in chunks])
+
+    flat_results: List[Point] = []
+    for r in chunk_results:
+        flat_results.extend(r)
+    return flat_results
 

@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple
 from ..crypto.curve import Point, generate_private_scalar
-from ..crypto.engine import blind_point, hash_and_blind
+from ..crypto.engine import blind_point, blind_points, hash_and_blind, hash_and_blind_batch
 from ..data_pipeline.schema import Schema
 from .messages import (
     ClientRound1Message,
@@ -105,9 +105,7 @@ class PSIClient:
         if self.state != ClientState.HANDSHAKE_SENT:
             raise RuntimeError("Must complete handshake before executing Round 1.")
 
-        self.client_blinded_points = [
-            hash_and_blind(self.scalar_a, cri) for cri in self.cri_records
-        ]
+        self.client_blinded_points = hash_and_blind_batch(self.scalar_a, self.cri_records)
         msg = ClientRound1Message.create(self.client_blinded_points)
         self.state = ClientState.ROUND_1_SENT
         return msg
@@ -137,9 +135,9 @@ class PSIClient:
 
         # Compute P_{ab,j} = a * P_{b,j} for all server points
         # and store their 33-byte compressed representations in a fast set
+        blinded_server_pts = blind_points(self.scalar_a, server_blinded)
         server_lookup: Set[bytes] = {
-            blind_point(self.scalar_a, p_b).to_compressed_bytes()
-            for p_b in server_blinded
+            pt.to_compressed_bytes() for pt in blinded_server_pts
         }
 
         matched_indices: List[int] = []

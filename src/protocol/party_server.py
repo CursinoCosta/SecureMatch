@@ -7,7 +7,7 @@ import secrets
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from ..crypto.curve import Point, generate_private_scalar
-from ..crypto.engine import blind_point, hash_and_blind
+from ..crypto.engine import blind_point, blind_points, hash_and_blind, hash_and_blind_batch
 from ..data_pipeline.schema import Schema
 from .messages import (
     ClientRound1Message,
@@ -90,10 +90,10 @@ class PSIServer:
 
         # 1. Double-blind client points: P_{ba,i} = b * P_{a,i}
         # (Preserves client's index ordering so client can map matches locally)
-        doubly_blinded = [blind_point(self.scalar_b, pt) for pt in client_points]
+        doubly_blinded = blind_points(self.scalar_b, client_points)
 
         # 2. Blind server's own dataset: P_{b,j} = b * H(y_j)
-        server_blinded = [hash_and_blind(self.scalar_b, cri) for cri in self.cri_records]
+        server_blinded = hash_and_blind_batch(self.scalar_b, self.cri_records)
 
         # 3. Cryptographically random shuffle using CSPRNG
         rng = secrets.SystemRandom()

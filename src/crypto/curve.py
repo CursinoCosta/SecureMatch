@@ -229,21 +229,28 @@ def _to_affine(p: JacobianPoint) -> Point:
 
 def point_multiply(k: int, pt: Point) -> Point:
     """
-    Computes the scalar multiplication k * pt on secp256k1 using Jacobian coordinates.
-    Runs in linear time relative to scalar bitlength.
+    Computes the scalar multiplication k * pt on secp256k1 using Jacobian coordinates
+    with a 4-bit fixed window to minimize group additions.
     """
     if pt.is_infinity or k % N == 0:
         return Point.infinity()
 
     k = k % N
-    result: JacobianPoint = (0, 0, 0)
-    current: JacobianPoint = (pt.x, pt.y, 1)
 
-    while k > 0:
-        if k & 1:
-            result = _jacobian_add(result, current)
-        current = _jacobian_double(current)
-        k >>= 1
+    # Precompute 1P .. 15P in Jacobian coordinates
+    p_jac = (pt.x, pt.y, 1)
+    table: list[JacobianPoint | None] = [None] * 16
+    table[1] = p_jac
+    for i in range(2, 16):
+        table[i] = _jacobian_add(table[i - 1], p_jac)
+
+    result: JacobianPoint = (0, 0, 0)
+    for ch in f"{k:064x}":
+        for _ in range(4):
+            result = _jacobian_double(result)
+        val = int(ch, 16)
+        if val > 0:
+            result = _jacobian_add(result, table[val])
 
     return _to_affine(result)
 
