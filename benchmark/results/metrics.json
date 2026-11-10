@@ -1,0 +1,227 @@
+{
+  "metadata": {
+    "title": "SecureMatch Comprehensive Cryptographic & Scalability Benchmark",
+    "timestamp": "2026-11-10T01:05:33Z",
+    "quick_mode": true,
+    "curve": "secp256k1",
+    "protocol": "Commutative ECDH-PSI",
+    "total_elapsed_seconds": 39.14977004900015
+  },
+  "benchmark_1_scalability": [
+    {
+      "size": 50,
+      "overlap_count": 25,
+      "naive": {
+        "elapsed_seconds": 0.00014149899993753934,
+        "throughput_rec_per_sec": 797092.2077667991,
+        "wire_bytes": 2400
+      },
+      "ecdh_psi": {
+        "elapsed_seconds": 0.5384913299999425,
+        "throughput_rec_per_sec": 185.7040112419464,
+        "wire_bytes": 5299
+      },
+      "privacy_tax_time_ratio": 3805.6193346782948,
+      "wire_overhead_ratio": 2.2079166666666667
+    },
+    {
+      "size": 100,
+      "overlap_count": 50,
+      "naive": {
+        "elapsed_seconds": 0.00032282799998029077,
+        "throughput_rec_per_sec": 656514.7601402377,
+        "wire_bytes": 4800
+      },
+      "ecdh_psi": {
+        "elapsed_seconds": 1.0327514179998616,
+        "throughput_rec_per_sec": 193.65744409951205,
+        "wire_bytes": 10251
+      },
+      "privacy_tax_time_ratio": 3199.0763442542557,
+      "wire_overhead_ratio": 2.135625
+    },
+    {
+      "size": 200,
+      "overlap_count": 100,
+      "naive": {
+        "elapsed_seconds": 0.0004042569999000989,
+        "throughput_rec_per_sec": 1060948.8600367685,
+        "wire_bytes": 9600
+      },
+      "ecdh_psi": {
+        "elapsed_seconds": 2.074244932999818,
+        "throughput_rec_per_sec": 192.84125690089613,
+        "wire_bytes": 20151
+      },
+      "privacy_tax_time_ratio": 5131.005606612653,
+      "wire_overhead_ratio": 2.0990625
+    }
+  ],
+  "benchmark_2_component_breakdown": {
+    "dataset_size": 200,
+    "total_time_seconds": 2.075757027999998,
+    "stages": {
+      "1_normalization_and_cri": {
+        "seconds": 0.0010818140001447318,
+        "percentage": 0.052116600620982355
+      },
+      "2_hash_to_curve": {
+        "seconds": 0.21589330000006157,
+        "percentage": 10.400701868661178
+      },
+      "3_first_blinding": {
+        "seconds": 0.8968573049999122,
+        "percentage": 43.20627572987377
+      },
+      "4_wire_serialization_and_channel": {
+        "seconds": 0.11772844600000099,
+        "percentage": 5.671590865980732
+      },
+      "5_second_blinding": {
+        "seconds": 0.8439320039999529,
+        "percentage": 40.65658902347957
+      },
+      "6_set_intersection_lookup": {
+        "seconds": 0.00024382300011893676,
+        "percentage": 0.011746220623608408
+      }
+    }
+  },
+  "benchmark_3_asymmetric_scale": [
+    {
+      "size_a": 200,
+      "size_b": 200,
+      "ratio_b_to_a": 1.0,
+      "overlap_count": 100,
+      "elapsed_seconds": 2.0582889899999373,
+      "bytes_sent_a": 6766,
+      "bytes_sent_b": 13385,
+      "total_wire_bytes": 20151,
+      "pt_ops_per_party": 400
+    },
+    {
+      "size_a": 200,
+      "size_b": 500,
+      "ratio_b_to_a": 2.5,
+      "overlap_count": 100,
+      "elapsed_seconds": 3.6078756029999113,
+      "bytes_sent_a": 6766,
+      "bytes_sent_b": 23285,
+      "total_wire_bytes": 30051,
+      "pt_ops_per_party": 700
+    },
+    {
+      "size_a": 200,
+      "size_b": 1000,
+      "ratio_b_to_a": 5.0,
+      "overlap_count": 100,
+      "elapsed_seconds": 6.157920224000009,
+      "bytes_sent_a": 6766,
+      "bytes_sent_b": 39786,
+      "total_wire_bytes": 46552,
+      "pt_ops_per_party": 1200
+    }
+  ],
+  "benchmark_4_channel_overhead": [
+    {
+      "size": 50,
+      "in_memory_seconds": 0.6794097750000674,
+      "tcp_socket_seconds": 0.5723926570001368,
+      "network_overhead_seconds": -0.10701711799993063,
+      "network_overhead_percent": -15.751483410717784
+    },
+    {
+      "size": 200,
+      "in_memory_seconds": 2.3179688789998636,
+      "tcp_socket_seconds": 2.617837045999977,
+      "network_overhead_seconds": 0.2998681670001133,
+      "network_overhead_percent": 12.936677869872772
+    }
+  ],
+  "benchmark_5_data_decay": [
+    {
+      "noise_ratio": 0.0,
+      "expected_true_matches": 100,
+      "raw_matching": {
+        "matched_count": 100,
+        "recall_percent": 100.0,
+        "fnr_percent": 0.0
+      },
+      "canonical_pipeline": {
+        "matched_count": 100,
+        "recall_percent": 100.0,
+        "fnr_percent": 0.0
+      }
+    },
+    {
+      "noise_ratio": 0.05,
+      "expected_true_matches": 100,
+      "raw_matching": {
+        "matched_count": 94,
+        "recall_percent": 94.0,
+        "fnr_percent": 6.000000000000005
+      },
+      "canonical_pipeline": {
+        "matched_count": 100,
+        "recall_percent": 100.0,
+        "fnr_percent": 0.0
+      }
+    },
+    {
+      "noise_ratio": 0.1,
+      "expected_true_matches": 100,
+      "raw_matching": {
+        "matched_count": 90,
+        "recall_percent": 90.0,
+        "fnr_percent": 9.999999999999998
+      },
+      "canonical_pipeline": {
+        "matched_count": 100,
+        "recall_percent": 100.0,
+        "fnr_percent": 0.0
+      }
+    },
+    {
+      "noise_ratio": 0.2,
+      "expected_true_matches": 100,
+      "raw_matching": {
+        "matched_count": 74,
+        "recall_percent": 74.0,
+        "fnr_percent": 26.0
+      },
+      "canonical_pipeline": {
+        "matched_count": 100,
+        "recall_percent": 100.0,
+        "fnr_percent": 0.0
+      }
+    },
+    {
+      "noise_ratio": 0.35,
+      "expected_true_matches": 100,
+      "raw_matching": {
+        "matched_count": 71,
+        "recall_percent": 71.0,
+        "fnr_percent": 29.000000000000004
+      },
+      "canonical_pipeline": {
+        "matched_count": 100,
+        "recall_percent": 100.0,
+        "fnr_percent": 0.0
+      }
+    },
+    {
+      "noise_ratio": 0.5,
+      "expected_true_matches": 100,
+      "raw_matching": {
+        "matched_count": 53,
+        "recall_percent": 53.0,
+        "fnr_percent": 47.0
+      },
+      "canonical_pipeline": {
+        "matched_count": 100,
+        "recall_percent": 100.0,
+        "fnr_percent": 0.0
+      }
+    }
+  ]
+}
