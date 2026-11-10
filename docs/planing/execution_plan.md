@@ -133,19 +133,23 @@ Nov 18:          Final Delivery & In-Class Presentation
   - Generate controllable datasets with configurable overlap percentages ($0\%, 10\%, 50\%, 100\%$).
   - Supports CPF, CNPJ (numeric + modern Receita Federal alphanumeric), Phone + Region, and arbitrary random 2-4 column composite keys.
   - Injects dirty data (punctuation masks, whitespace, casing, accents) to measure normalization resilience.
-- [x] **Task 4.2: Automated Benchmark Runner (`benchmark/run_benchmarks.py`)**
-  - Evaluates 5 core empirical experiments:
-    1. Scalability & Privacy Tax ($N \in [50, 100, 200, 500, 1000, 2000]$).
-    2. Component runtime breakdown (Normalization 0.1%, Hash-to-Curve 10.4%, Blinding 83.9%, Wire 5.7%).
-    3. Asymmetric scale dilemma ($|A| \ll |B|$, e.g., clinic cohort vs regional hospital).
-    4. Channel transport overhead (In-Memory direct channel vs Localhost TCP socket).
-    5. Data quality decay & False Negative Rate ($\eta \in [0\%, 50\%]$ noise).
-  - Serializes full metrics to `benchmark/results/metrics.json`.
+- [x] **Task 4.2: Automated Benchmark Runner (`benchmark/run_orchestrator.py` & `benchmark/run_benchmarks.py`)**
+  - Evaluates 5 core empirical experiments with granular per-scale checkpointing:
+    1. Scalability & Privacy Tax: Evaluated up to **$N = 500{,}000$ records per party ($1{,}000{,}000$ total records)** ($N \in [100,\; 1{,}000,\; 10{,}000,\; 50{,}000,\; 100{,}000,\; 500{,}000]$).
+    2. Component runtime breakdown ($N = 1{,}000$: Normalization 0.03%, Hash-to-Curve 9.2%, Blinding 85.9%, Wire 4.8%).
+    3. Asymmetric scale dilemma: Evaluated up to **$|B| = 500{,}000$ records** against fixed Clinic $|A| = 500$ ($|B| \in [1{,}000,\; 10{,}000,\; 50{,}000,\; 100{,}000,\; 500{,}000]$).
+    4. Channel transport overhead (In-Memory direct channel vs Localhost TCP socket: $< 4\%$ network overhead).
+    5. Data quality decay & False Negative Rate ($\eta \in [0\%, 50\%]$ noise: Raw recall drops to $51.4\%$, SecureMatch canonical pipeline achieves $100.0\%$).
+  - Serializes full metrics to `benchmark/results/metrics.json` and resilient state to `benchmark/results/checkpoint.json`.
 - [x] **Task 4.3: Baseline Comparison & Security Cracker (`benchmark/baseline_naive.py` & `benchmark/security_cracker.py`)**
   - Implemented naive SHA-256 PSI baseline to measure the theoretical CPU upper bound and exact "Privacy Tax" multiplier.
   - Implemented practical cryptanalysis suite:
     - Preimage attack recovering SHA-256 CPFs in $< 0.3\text{ s}$ and CNPJs in $< 0.01\text{ s}$.
-    - Exhaustive ECDLP discrete logarithm search on `secp256k1` demonstrating $\sim 140{,}000\text{ pts/s}$, proving $2.7 \times 10^{64}$ years / $1.9 \times 10^{54}$ universe lifetimes needed to exhaust the 256-bit keyspace.
+    - Exhaustive ECDLP discrete logarithm search on `secp256k1` executed for **3.00 hours (10,800.05 seconds)**:
+      - **1,411,050,000 attempts** (~1.411 billion curve points evaluated).
+      - Throughput: **130,652 point ops/sec**.
+      - Keyspace explored: $\approx 1.22 \times 10^{-67}\%$.
+      - Time needed to exhaust: $2.81 \times 10^{64}$ years ($2.04 \times 10^{54}$ universe lifetimes).
 - [x] **Task 4.4: Publication-Quality Plot Generation (`benchmark/plot_metrics.py`)**
   - Generated 6 publication-ready figures in `benchmark/results/`:
     - `fig1_scalability_privacy_tax.png`: Execution time and Privacy Tax curve.
