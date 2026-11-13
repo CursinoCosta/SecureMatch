@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 SecureMatch — Confidential Record Linkage Application (Streamlit).
 
@@ -17,6 +15,8 @@ A peer-to-peer data collaboration interface between two symmetric organizations
    - Executive metrics from 500,000-record scaling and 3-hour secp256k1 exhaustion attack (1.411 billion attempts).
    - High-resolution evaluation figures and interactive live SHA-256 vulnerability cracker.
 """
+
+from __future__ import annotations
 
 import csv
 import io
