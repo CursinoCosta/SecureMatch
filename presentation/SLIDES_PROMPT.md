@@ -54,15 +54,56 @@ Your objective is to generate an authoritative, highly polished **8-to-9 slide g
   - Pre-image collision resistance ($\sim 2^{256}$) relies on high min-entropy across the input domain $\mathcal{X}$.
   - Real-world canonical identifiers exhibit bounded, low-entropy spaces:
     - Brazilian National ID (CPF): 9 digits + 2 check digits $\rightarrow |\mathcal{X}| = 10^9 \approx 2^{29.9}$ states.
+    - Brazilian Corporate ID (CNPJ): 8 base digits + 4 branch digits + 2 check digits.
     - National E.164 Telephone Numbers: 10 to 11 digits $\rightarrow |\mathcal{X}| \approx 10^{11} \approx 2^{36.5}$ states.
-- **Empirical Cryptanalytic Inversion:**
-  - Modern commodity GPUs evaluate $>10^{10}$ SHA-256 digests/second. The entire valid CPF population space ($10^9$) is completely inverted via offline dictionary or rainbow-table attacks in **$< 100$ milliseconds**.
-  - Salt distribution paradox: Symmetric salts require pre-shared keys (creating insider vulnerability); asymmetric salts destroy deterministic equality checking.
-- **Key Takeaway:** Unblinded deterministic hashing provides **zero forward privacy** against semi-honest peers.
+- **The Core Flaw:** Deterministic hashing without secret-key binding offers zero forward privacy. Any observer or semi-honest participant with a precomputed dictionary can invert the entire identifier universe.
 
 ---
 
-### Slide 4: Cryptographic Primitive: Commutative ECDH-PSI
+### Slide 4: Empirical Cryptanalysis: Cracking SHA-256 vs. secp256k1 Exhaustion
+- **Slide Title:** Empirical Security: Inverting SHA-256 vs. Exhausting $\text{secp256k1}$
+- **Objective:** Directly contrast the vulnerability of deterministic SHA-256 against the computational hardness of the $\text{secp256k1}$ discrete logarithm problem using exact empirical measurements.
+- **Layout & Visual Structure:** Two distinct, high-contrast panels/columns comparing identical adversary resources.
+
+- **Panel A: The Fragility of SHA-256 (Empirical Inversion)**
+  - **Attack Model:** Deterministic pre-image recovery via sequential dictionary lookup against intercepted hashes on commodity single-core CPU.
+  - **Case 1 — Brazilian National ID (CPF):**
+    - Target Plaintext: `12345678909`
+    - Target Hash: `7ec94663084bd506d4f0c3e21042df233681fd7426e93f397c921b1d3e397bba`
+    - Evaluated Attempts: `56,790` evaluations
+    - Execution Time to Crack: **`0.2835977739998725` seconds** ($\approx 283.60 \text{ ms}$)
+    - Sustained Hash Rate: `200,248.40` hashes/sec
+  - **Case 2 — Brazilian Corporate Tax ID (CNPJ):**
+    - Target Plaintext: `12345678000195`
+    - Target Hash: `ae9351af0d397d503ea2ec21addc17e364b940411cfa37d8e8874c06b550a40b`
+    - Evaluated Attempts: `679` evaluations
+    - Execution Time to Crack: **`0.0029102910000347038` seconds** ($\approx 2.91 \text{ ms}$)
+    - Sustained Hash Rate: `233,310.00` hashes/sec
+  - **Cryptanalytic Verdict:** Complete compromise. Low-entropy identifiers hashed with SHA-256 provide **zero security** against an honest-but-curious peer.
+
+- **Panel B: The Intractability of $\text{secp256k1}$ (3-Hour Exhaustion Attack)**
+  - **Attack Model:** Semi-honest wiretapper attempting to invert blinded curve point $P = k \cdot H(x)$ via scalar exhaustion over the elliptic curve subgroup.
+  - **Key Space Dimension:**
+    - Subgroup prime order $r$:
+      $$r = 115792089237316195423570985008687907852837564279074904382605163141518161494337$$
+      ($\approx 1.157920892373162 \times 10^{77}$ discrete states)
+  - **Empirical Attack Parameters & Measured Results:**
+    - Continuous Execution Duration: **`10800.048020872` seconds** (`3.0000133391311112` hours)
+    - Total Point Multiplications Evaluated: **`1,411,050,000` attempts** ($\approx 1.41105 \times 10^9$)
+    - Sustained Throughput: `130,652.20` scalar point ops/sec
+    - Attack Success Rate: **Strictly 0.000%** (zero keys recovered, zero points inverted)
+  - **Proportion of Keyspace Explored:**
+    $$\text{Keyspace Explored} = \mathbf{1.2186065639666016 \times 10^{-66}\%}$$
+    $$\left(\text{Fraction of total space: } 1.2186065639666016 \times 10^{-68}\right)$$
+  - **Theoretical Horizon at Measured Throughput:**
+    - Time required to exhaust scalar space: **`2.8083950981450736` $\times 10^{64}$ years**
+    - Equivalent to **`2.0350689116993288` $\times 10^{54}$ lifetimes of the universe** (assuming $\approx 1.38 \times 10^{10}$ years/lifetime).
+
+- **Slide Takeaway:** While raw SHA-256 breaks in fractions of a second (`0.0029` s to `0.2836` s), 3 hours of non-stop attack on $\text{secp256k1}$ covered only $10^{-66}\%$ of the space. Blinded curve points are computationally impenetrable.
+
+---
+
+### Slide 5: Cryptographic Primitive: Commutative ECDH-PSI
 - **Slide Title:** Protocol Foundation: Commutative Diffie-Hellman on Elliptic Curves
 - **Mathematical Foundations:**
   - Let $E(\mathbb{F}_p)$ be the Koblitz curve **$\text{secp256k1}$** of prime order $r$.
@@ -83,7 +124,7 @@ Your objective is to generate an authoritative, highly polished **8-to-9 slide g
 
 ---
 
-### Slide 5: The SecureMatch Pipeline & Engineering Perks
+### Slide 6: The SecureMatch Pipeline & Engineering Perks
 - **Slide Title:** Production Architecture: Normalization, Key Synthesis & Peer-to-Peer Execution
 - **System Components:**
   1. **Canonical Record Identifier (CRI) Standardization:**
@@ -100,7 +141,7 @@ Your objective is to generate an authoritative, highly polished **8-to-9 slide g
 
 ---
 
-### Slide 6: Empirical Scalability & Computational Decomposition
+### Slide 7: Empirical Scalability & Computational Decomposition
 - **Slide Title:** Empirical Scalability: Strict $O(N)$ Linearity up to $500{,}000$ Records
 - **Visual Assets:**
   - **Primary Figure (Full Width / Prominent):** `presentation/assets/fig1_scalability_privacy_tax.png`
@@ -119,25 +160,17 @@ Your objective is to generate an authoritative, highly polished **8-to-9 slide g
 
 ---
 
-### Slide 7: Bandwidth Overhead & High-Assurance Cryptanalysis
-- **Slide Title:** Network Efficiency & The 3-Hour Exhaustion Attack
-- **Visual Assets (Two-Column Layout):**
-  - **Left Column:** `presentation/assets/fig4_cpu_vs_network.png` (Bandwidth vs. CPU)
-  - **Right Column:** `presentation/assets/fig6_security_cryptanalysis.png` (Exhaustion Attack)
-- **Column 1: Network Footprint:**
+### Slide 8: Bandwidth Overhead & Security Summary
+- **Slide Title:** Network Footprint & The Asymmetric Resource Profile
+- **Visual Asset:** `presentation/assets/fig4_cpu_vs_network.png` (Bandwidth vs. CPU)
+- **Key Findings:**
   - Transmission cost is strictly fixed at **$33 \text{ bytes} \times N$** per exchange direction (SEC1 compressed points).
   - Linking $100{,}000$ records requires only **$3.3 \text{ MB}$** of network payload.
   - Asymmetric resource profile: Protocol is strictly CPU-bound, never network-bound—ideal for cross-datacenter and public-cloud execution.
-- **Column 2: The 3-Hour Cryptanalytic Stress Test:**
-  - **Adversarial Setup:** Semi-honest attacker armed with a precomputed dictionary of $10^7$ candidate identity points attempting offline scalar inversion against wiretapped tokens.
-  - **Duration:** 3.0 continuous hours ($10{,}800$ seconds) under sustained execution.
-  - **Empirical Metric:** **$1{,}411{,}726{,}800$ point operations** ($\approx 1.411 \times 10^9$ attempts).
-  - **Empirical Success Rate:** **Strictly 0.000%** (zero keys recovered, zero records deanonymized).
-  - **Theoretical Horizon:** Full scalar domain exhaustion of $\text{secp256k1}$ ($r \approx 1.1579 \times 10^{77}$) requires $> 10^{60}$ compute-years.
 
 ---
 
-### Slide 8: Synthesis, Practical Trade-offs & Conclusions
+### Slide 9: Synthesis, Practical Trade-offs & Conclusions
 - **Slide Title:** Conclusions, Trade-offs, and Future Directions
 - **Core Contributions:**
   1. Validated that commutative elliptic-curve PSI delivers mathematically sound, regulatory-compliant (LGPD/GDPR) record linkage without trusted third parties.
@@ -157,11 +190,15 @@ Your objective is to generate an authoritative, highly polished **8-to-9 slide g
 | Dimension | Measured / Implemented Value |
 |---|---|
 | Elliptic Curve Primitive | Koblitz `secp256k1` ($\mathbb{F}_p$, 256-bit prime) |
+| Curve Subgroup Order $r$ | `115792089237316195423570985008687907852837564279074904382605163141518161494337` |
 | Security Equivalency | $\sim 128$ bits of symmetric security |
 | Wire Serialization Format | SEC1 Compressed Point (33 bytes) |
 | Maximum Experimental Scale | 500,000 records per organization (1,000,000 total) |
 | Computational Complexity | Strict $O(N)$ scalar point multiplications |
-| 3-Hour Exhaustion Work Factor | 1,411,726,800 point operations ($1.411 \times 10^9$) |
-| Exhaustion Attack Success Rate | **0.000%** |
-| Classical Time to Invert SHA-256 on CPF | $< 100$ milliseconds |
-| Classical Time to Invert secp256k1 Scalar | Infeasible ($> 10^{60}$ compute-years) |
+| SHA-256 CPF Crack Time | `0.2835977739998725` s (`56,790` attempts @ `200,248.40` ops/s) |
+| SHA-256 CNPJ Crack Time | `0.0029102910000347038` s (`679` attempts @ `233,310.00` ops/s) |
+| secp256k1 Continuous Attack Duration | `10800.048020872` s (`3.0000133391311112` hours) |
+| secp256k1 Point Multiplications Evaluated | `1,411,050,000` attempts |
+| secp256k1 Exhaustion Success Rate | **Strictly 0.000%** (0 keys recovered) |
+| secp256k1 Keyspace Explored | **`1.2186065639666016e-66`%** (`1.2186065639666016e-68` fraction) |
+| Time to Exhaust secp256k1 at Measured Rate | `2.8083950981450736e+64` years (`2.0350689116993288e+54` universe lifetimes) |
