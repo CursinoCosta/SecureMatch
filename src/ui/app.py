@@ -58,39 +58,35 @@ st.set_page_config(
 # Custom Styling (Theme-Adaptive for Light & Dark Mode)
 st.markdown("""
 <style>
-    .hero-banner {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.14) 0%, rgba(168, 85, 247, 0.12) 100%);
+    .title-card {
+        background-color: var(--secondary-background-color);
         border: 1px solid rgba(128, 128, 128, 0.25);
-        border-left: 5px solid #3B82F6;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin-bottom: 1.4rem;
+        border-left: 4px solid #3B82F6;
+        border-radius: 8px;
+        padding: 16px 22px;
+        margin-bottom: 1.2rem;
     }
-    .hero-title {
-        font-size: 2.25rem;
-        font-weight: 800;
-        letter-spacing: -0.02em;
+    .title-card-heading {
+        font-size: 1.9rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
         color: var(--text-color);
-        margin: 0 0 6px 0;
-        line-height: 1.15;
+        margin: 0 0 4px 0;
+        line-height: 1.2;
     }
-    .hero-accent {
-        background: linear-gradient(90deg, #60A5FA, #C084FC);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .hero-subtitle {
-        font-size: 1.02rem;
+    .title-card-sub {
+        font-size: 0.96rem;
         color: var(--text-color);
-        opacity: 0.85;
-        margin: 0 0 12px 0;
+        opacity: 0.78;
+        margin: 0;
     }
-    .hero-pills {
+    .about-pills {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        margin: 10px 0 16px 0;
     }
-    .hero-pill {
+    .about-pill {
         background-color: var(--secondary-background-color);
         color: var(--text-color);
         border: 1px solid rgba(128, 128, 128, 0.28);
@@ -114,16 +110,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div class="hero-banner">
-    <div class="hero-title">🏥 <span class="hero-accent">SecureMatch</span> &mdash; Confidential Record Linkage</div>
-    <div class="hero-subtitle">
-        Bilateral Privacy-Preserving Entity Reconciliation between independent organizations without exposing non-matching records.
-    </div>
-    <div class="hero-pills">
-        <span class="hero-pill">🔒 Commutative ECDH-PSI</span>
-        <span class="hero-pill">📐 secp256k1 Curve</span>
-        <span class="hero-pill">🧬 Canonical Normalization</span>
-        <span class="hero-pill">🎓 DCC / ICEx / UFMG</span>
+<div class="title-card">
+    <div class="title-card-heading">🏥 SecureMatch &mdash; Confidential Record Linkage</div>
+    <div class="title-card-sub">
+        Peer-to-Peer Private Set Intersection (ECDH-PSI)
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -183,10 +173,11 @@ def render_dataframe(data: Any) -> None:
 # ---------------------------------------------------------------------------
 # Navigation Tabs
 # ---------------------------------------------------------------------------
-main_tab_linkage, main_tab_behind, main_tab_analytics = st.tabs([
+main_tab_linkage, main_tab_behind, main_tab_analytics, main_tab_about = st.tabs([
     "🤝 Peer-to-Peer Record Linkage Console",
     "🔬 Behind the Scenes: Cryptographic Inspection",
     "📊 Empirical Benchmark & Security Analytics",
+    "ℹ️ About This Project",
 ])
 
 
@@ -1235,3 +1226,60 @@ with main_tab_analytics:
                     st.write(f"- **Throughput:** {res_c['hash_rate_ops_per_sec']:,.0f} hashes/sec")
                 else:
                     st.warning("Not found within attempt budget.")
+
+
+# ===========================================================================
+# TAB 4: ABOUT THIS PROJECT
+# ===========================================================================
+with main_tab_about:
+    st.markdown("### ℹ️ About SecureMatch")
+    st.markdown(
+        "Bilateral Privacy-Preserving Entity Reconciliation between independent organizations "
+        "without exposing non-matching records, private keys, or sensitive patient/corporate attributes."
+    )
+
+    st.markdown("""
+    <div class="about-pills">
+        <span class="about-pill">🔒 Commutative ECDH-PSI</span>
+        <span class="about-pill">📐 secp256k1 Curve (256-bit)</span>
+        <span class="about-pill">🧬 Canonical Normalization &amp; CRI</span>
+        <span class="about-pill">🎓 DCC / ICEx / UFMG</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    about_c1, about_c2 = st.columns(2)
+
+    with about_c1:
+        st.markdown("#### 🎯 Project Scope & Academic Context")
+        st.markdown(
+            "- **Course:** Cryptography (2026/2) — DCC / ICEx / UFMG\n"
+            "- **Professor:** Prof. Jeroen van de Graaf\n"
+            "- **Author:** Mateus Cursino Costa (`2022043191`)\n"
+            "- **Goal:** Enable two equal peers (e.g., Hospital A and Hospital B) to discover shared "
+            "entities in their private databases while keeping non-matching records mathematically hidden."
+        )
+
+        st.markdown("#### 🧩 Key Features")
+        st.markdown(
+            "- **Symmetric Peer Model:** Both organizations receive their own table enriched with `matched: YES / NO`.\n"
+            "- **Configurable Keys:** Brazilian CPF, Numeric & Modern Alphanumeric CNPJ, Phone + Region, "
+            "and user-ordered multi-column custom composite keys.\n"
+            "- **Pattern Portability:** Export and import agreed matching schemas as JSON."
+        )
+
+    with about_c2:
+        st.markdown("#### 🔐 Cryptographic Architecture")
+        st.markdown(
+            "1. **Canonical Record Identifier (CRI):** Fields are cleaned via NFKD normalization, MOD-11 "
+            "validation, E.164 formatting, and length-prefixed serialization (`field:len:val|...`) to "
+            "eliminate delimiter-injection and formatting mismatches.\n"
+            "2. **Hash-to-Curve:** Deterministic domain-separated Hash-and-Increment maps each CRI onto "
+            "a valid point $P = H(x) \\in E(\\mathbb{F}_p)$ on `secp256k1` using Euler's quadratic residue test.\n"
+            "3. **Commutative Double-Lock:** Each party multiplies points by a secret 256-bit scalar using "
+            "projective Jacobian coordinates. Because scalar multiplication commutes:\n"
+            "   $$a \\cdot (b \\cdot H(x)) = b \\cdot (a \\cdot H(x))$$\n"
+            "   matching records yield identical 33-byte SEC 1 compressed points, while unmatched records "
+            "remain indistinguishable from random noise under the CDH assumption."
+        )
