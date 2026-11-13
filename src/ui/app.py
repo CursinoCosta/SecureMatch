@@ -222,7 +222,13 @@ with main_tab_linkage:
             st.session_state["raw_csv_a"] = dict_list_to_csv(data_a)
             st.session_state["raw_csv_b"] = dict_list_to_csv(data_b)
             st.session_state["key_type_override"] = target_key_type
-            st.session_state.pop("last_psi_execution", None)
+            st.session_state["key_type_selector"] = target_key_type
+            for stale_key in [
+                "last_psi_execution", "col_map_a", "col_map_b",
+                "col_phone_a", "col_reg_a", "col_phone_b", "col_reg_b",
+                "sel_cols_a", "sel_cols_b", "selected_match_idx", "selected_unmatch_idx",
+            ]:
+                st.session_state.pop(stale_key, None)
 
             if key_kw == "custom_random":
                 st.session_state["imported_pattern"] = {
@@ -444,8 +450,8 @@ with main_tab_linkage:
                     if cand in headers_a:
                         p_idx = headers_a.index(cand)
                         break
-                r_idx = min(1, len(headers_a) - 1)
-                for cand in ["estado_uf", "uf", "regiao", "region"]:
+                r_idx = next((i for i in range(len(headers_a)) if i != p_idx), 0)
+                for cand in ["uf_estado", "estado_uf", "uf", "regiao", "region"]:
                     if cand in headers_a:
                         r_idx = headers_a.index(cand)
                         break
@@ -595,8 +601,8 @@ with main_tab_linkage:
                     if cand in headers_b:
                         p_idx = headers_b.index(cand)
                         break
-                r_idx = min(1, len(headers_b) - 1)
-                for cand in ["uf_residencia", "uf", "regiao", "region"]:
+                r_idx = next((i for i in range(len(headers_b)) if i != p_idx), 0)
+                for cand in ["regiao", "uf_residencia", "uf_estado", "estado_uf", "uf", "region"]:
                     if cand in headers_b:
                         r_idx = headers_b.index(cand)
                         break
@@ -807,11 +813,16 @@ with main_tab_linkage:
                 key="dl_full_a",
             )
 
+            key_cols_list_a = [c.strip() for c in key_col_a.split("+") if c.strip() and c.strip() != "None"]
+            if not key_cols_list_a:
+                key_cols_list_a = [list(enriched_a[0].keys())[0]]
             key_only_a = io.StringIO()
-            key_writer_a = csv.DictWriter(key_only_a, fieldnames=[key_col_a, "matched"])
+            key_writer_a = csv.DictWriter(key_only_a, fieldnames=key_cols_list_a + ["matched"])
             key_writer_a.writeheader()
             for r in enriched_a:
-                key_writer_a.writerow({key_col_a: r.get(key_col_a, ""), "matched": r["matched"]})
+                row_out = {c: r.get(c, "") for c in key_cols_list_a}
+                row_out["matched"] = r["matched"]
+                key_writer_a.writerow(row_out)
 
             st.download_button(
                 label="🔑 Download Keys-Only with 'matched' column (CSV)",
@@ -840,11 +851,16 @@ with main_tab_linkage:
                 key="dl_full_b",
             )
 
+            key_cols_list_b = [c.strip() for c in key_col_b.split("+") if c.strip() and c.strip() != "None"]
+            if not key_cols_list_b:
+                key_cols_list_b = [list(enriched_b[0].keys())[0]]
             key_only_b = io.StringIO()
-            key_writer_b = csv.DictWriter(key_only_b, fieldnames=[key_col_b, "matched"])
+            key_writer_b = csv.DictWriter(key_only_b, fieldnames=key_cols_list_b + ["matched"])
             key_writer_b.writeheader()
             for r in enriched_b:
-                key_writer_b.writerow({key_col_b: r.get(key_col_b, ""), "matched": r["matched"]})
+                row_out = {c: r.get(c, "") for c in key_cols_list_b}
+                row_out["matched"] = r["matched"]
+                key_writer_b.writerow(row_out)
 
             st.download_button(
                 label="🔑 Download Keys-Only with 'matched' column (CSV)",
@@ -853,6 +869,40 @@ with main_tab_linkage:
                 mime="text/csv",
                 key="dl_key_b",
             )
+
+        # -------------------------------------------------------------------
+        # Section 4: Matched Keys Table (Plaintext vs Encrypted Points)
+        # -------------------------------------------------------------------
+        st.markdown("---")
+        st.markdown("### 4. Matched Keys Table (Decrypted / Plaintext vs. Encrypted Curve Points)")
+        st.caption(
+            "Displays every discovered match alongside its canonical plaintext identifier, each hospital's "
+            "singly-encrypted curve point ($a \\cdot H(x)$ and $b \\cdot H(y)$), and the resulting identical "
+            "double-blinded commutative token ($ab \\cdot P$)."
+        )
+        trace = exec_data["trace"]
+        if not trace["matched_indices_a"]:
+            st.info("No matched records were found in this run.")
+        else:
+            matched_table = []
+            for idx_a in trace["matched_indices_a"]:
+                shared_pt_bytes = trace["doubly_a"][idx_a].to_compressed_bytes()
+                idx_b = next(
+                    i for i, pt in enumerate(trace["doubly_b"]) if pt.to_compressed_bytes() == shared_pt_bytes
+                )
+                matched_table.append({
+                    "Decrypted / Canonical Key (CRI)": trace["cri_a"][idx_a].decode("utf-8"),
+                    "Hospital A Raw Key": " | ".join(
+                        str(trace["rows_a"][idx_a].get(c.strip(), "")) for c in trace["key_col_a"].split("+")
+                    ),
+                    "Hospital B Raw Key": " | ".join(
+                        str(trace["rows_b"][idx_b].get(c.strip(), "")) for c in trace["key_col_b"].split("+")
+                    ),
+                    "Encrypted A (a·P)": trace["blinded_a"][idx_a].to_compressed_bytes().hex()[:20] + "...",
+                    "Encrypted B (b·P)": trace["blinded_b"][idx_b].to_compressed_bytes().hex()[:20] + "...",
+                    "Shared Token (ab·P)": shared_pt_bytes.hex()[:24] + "...",
+                })
+            render_dataframe(matched_table)
 
 
 # ===========================================================================
