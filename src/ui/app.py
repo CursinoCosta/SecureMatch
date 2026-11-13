@@ -58,8 +58,47 @@ st.set_page_config(
 # Custom Styling (Theme-Adaptive for Light & Dark Mode)
 st.markdown("""
 <style>
-    .main-title { font-size: 2.2rem; font-weight: 700; color: var(--text-color); margin-bottom: 0.1rem; }
-    .sub-title { font-size: 1.05rem; color: var(--text-color); opacity: 0.78; margin-bottom: 1.2rem; }
+    .hero-banner {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.14) 0%, rgba(168, 85, 247, 0.12) 100%);
+        border: 1px solid rgba(128, 128, 128, 0.25);
+        border-left: 5px solid #3B82F6;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 1.4rem;
+    }
+    .hero-title {
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text-color);
+        margin: 0 0 6px 0;
+        line-height: 1.15;
+    }
+    .hero-accent {
+        background: linear-gradient(90deg, #60A5FA, #C084FC);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+        font-size: 1.02rem;
+        color: var(--text-color);
+        opacity: 0.85;
+        margin: 0 0 12px 0;
+    }
+    .hero-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .hero-pill {
+        background-color: var(--secondary-background-color);
+        color: var(--text-color);
+        border: 1px solid rgba(128, 128, 128, 0.28);
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
     .org-header-a { color: #60A5FA; font-weight: 700; font-size: 1.25rem; margin-bottom: 8px; border-bottom: 2px solid rgba(96, 165, 250, 0.35); padding-bottom: 6px; }
     .org-header-b { color: #C084FC; font-weight: 700; font-size: 1.25rem; margin-bottom: 8px; border-bottom: 2px solid rgba(192, 132, 252, 0.35); padding-bottom: 6px; }
     .step-badge { background-color: var(--secondary-background-color); color: var(--text-color); border: 1px solid rgba(128, 128, 128, 0.3); font-weight: 600; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem; }
@@ -74,13 +113,20 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">🏥 SecureMatch: Confidential Record Linkage</div>', unsafe_allow_html=True)
-st.markdown(
-    '<div class="sub-title">'
-    'Privacy-Preserving Entity Reconciliation between Independent Organizations &bull; Commutative ECDH-PSI &bull; DCC / ICEx / UFMG'
-    '</div>',
-    unsafe_allow_html=True,
-)
+st.markdown("""
+<div class="hero-banner">
+    <div class="hero-title">🏥 <span class="hero-accent">SecureMatch</span> &mdash; Confidential Record Linkage</div>
+    <div class="hero-subtitle">
+        Bilateral Privacy-Preserving Entity Reconciliation between independent organizations without exposing non-matching records.
+    </div>
+    <div class="hero-pills">
+        <span class="hero-pill">🔒 Commutative ECDH-PSI</span>
+        <span class="hero-pill">📐 secp256k1 Curve</span>
+        <span class="hero-pill">🧬 Canonical Normalization</span>
+        <span class="hero-pill">🎓 DCC / ICEx / UFMG</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 # Default Hospital Sample Data
