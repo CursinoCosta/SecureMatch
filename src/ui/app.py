@@ -55,20 +55,22 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Custom Styling
+# Custom Styling (Theme-Adaptive for Light & Dark Mode)
 st.markdown("""
 <style>
-    .main-title { font-size: 2.2rem; font-weight: 700; color: #1E3A8A; margin-bottom: 0.1rem; }
-    .sub-title { font-size: 1.05rem; color: #4B5563; margin-bottom: 1.2rem; }
-    .org-header-a { color: #1D4ED8; font-weight: 700; font-size: 1.25rem; margin-bottom: 8px; border-bottom: 2px solid #DBEAFE; padding-bottom: 6px; }
-    .org-header-b { color: #7E22CE; font-weight: 700; font-size: 1.25rem; margin-bottom: 8px; border-bottom: 2px solid #F3E8FF; padding-bottom: 6px; }
-    .step-badge { background-color: #F3F4F6; color: #374151; font-weight: 600; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem; }
-    .security-banner { background-color: #ECFDF5; border: 1px solid #10B981; color: #065F46; padding: 12px 16px; border-radius: 8px; margin-top: 15px; margin-bottom: 15px; }
-    .cri-preview { background-color: #F9FAFB; border-left: 3px solid #3B82F6; font-family: monospace; font-size: 0.86rem; padding: 6px 10px; border-radius: 3px; word-break: break-all; }
-    .trace-card { background-color: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .match-tag { background-color: #DEF7EC; color: #03543F; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; }
-    .unmatch-tag { background-color: #FDE8E8; color: #9B1C1C; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; }
-    .metric-card { background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; text-align: center; }
+    .main-title { font-size: 2.2rem; font-weight: 700; color: var(--text-color); margin-bottom: 0.1rem; }
+    .sub-title { font-size: 1.05rem; color: var(--text-color); opacity: 0.78; margin-bottom: 1.2rem; }
+    .org-header-a { color: #60A5FA; font-weight: 700; font-size: 1.25rem; margin-bottom: 8px; border-bottom: 2px solid rgba(96, 165, 250, 0.35); padding-bottom: 6px; }
+    .org-header-b { color: #C084FC; font-weight: 700; font-size: 1.25rem; margin-bottom: 8px; border-bottom: 2px solid rgba(192, 132, 252, 0.35); padding-bottom: 6px; }
+    .step-badge { background-color: var(--secondary-background-color); color: var(--text-color); border: 1px solid rgba(128, 128, 128, 0.3); font-weight: 600; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem; }
+    .security-banner { background-color: rgba(16, 185, 129, 0.15); border: 1px solid #10B981; color: var(--text-color); padding: 12px 16px; border-radius: 8px; margin-top: 15px; margin-bottom: 15px; }
+    .cri-preview { background-color: var(--secondary-background-color); color: var(--text-color); border-left: 3px solid #3B82F6; font-family: monospace; font-size: 0.86rem; padding: 6px 10px; border-radius: 3px; word-break: break-all; }
+    .trace-card { background-color: var(--secondary-background-color); color: var(--text-color); border: 1px solid rgba(128, 128, 128, 0.25); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+    .match-tag { background-color: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; }
+    .unmatch-tag { background-color: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4); font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; }
+    .metric-card { background-color: var(--secondary-background-color); color: var(--text-color); border: 1px solid rgba(128, 128, 128, 0.25); border-radius: 8px; padding: 14px 12px; text-align: center; }
+    .metric-card h4 { margin: 0 0 6px 0; color: #60A5FA; font-size: 1.45rem; }
+    .metric-card p { margin: 0; font-size: 0.9rem; opacity: 0.85; }
 </style>
 """, unsafe_allow_html=True)
 
