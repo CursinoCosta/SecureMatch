@@ -1254,7 +1254,7 @@ with main_tab_about:
     with about_c1:
         st.markdown("#### 🎯 Project Scope & Academic Context")
         st.markdown(
-            "- **Course:** Cryptography (2026/2) — DCC / ICEx / UFMG\n"
+            "- **Course:** Cryptography - Theory and Applications (2026/2) — DCC / ICEx / UFMG\n"
             "- **Professor:** Prof. Jeroen van de Graaf\n"
             "- **Author:** Mateus Cursino Costa (`2022043191`)\n"
             "- **Goal:** Enable two equal peers (e.g., Hospital A and Hospital B) to discover shared "

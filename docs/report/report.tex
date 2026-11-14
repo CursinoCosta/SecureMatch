@@ -1,0 +1,140 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.0cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+\titleformat{\section}{\large\bfseries\uppercase}{}{0em}{}[\vspace{-0.4em}\rule{\textwidth}{0.4pt}\vspace{-0.2em}]
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\titlespacing*{\section}{0pt}{1.0em}{0.4em}
+\titlespacing*{\subsection}{0pt}{0.6em}{0.2em}
+\setlist{nosep, leftmargin=1.4em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+    {\small \textbf{Cryptography (2026/2) --- DCC / ICEx / UFMG}}\\[0.15em]
+    {\footnotesize Prof. Jeroen van de Graaf \quad $\bullet$\quad Final Project Report}
+    \vspace{0.4em}
+    \hrule height 0.8pt
+    \vspace{0.5em}
+    {\Large \textbf{SecureMatch: Confidential Record Linkage via\\Elliptic-Curve Diffie-Hellman Private Set Intersection}}
+    \vspace{0.3em}
+\end{center}
+
+\noindent\textbf{Author:} Mateus Cursino Gomes Costa \quad (\textbf{Student ID / Matrícula:} 2022043191)\\[0.2em]
+\textbf{Project Category:} Programming / Implementation \quad $\bullet$ \quad \textbf{Repository:} \url{https://github.com/CursinoCosta/SecureMatch}
+
+\section{Executive Summary \& Context}
+In regulated data environments governed by legislation such as the LGPD (Brazil) and GDPR (European Union), two symmetric organizations (e.g., competing healthcare networks, financial institutions monitoring fraud rings, or public epidemiological agencies) frequently require identifying records corresponding to the same physical individuals without disclosing non-intersecting proprietary records.
+
+A widespread yet dangerous industry heuristic consists of hashing canonical identifiers with deterministic algorithms such as SHA-256 and exchanging raw digests. Because personal identity attributes exhibit severely bounded entropy---such as the Brazilian National ID (CPF, $\sim 10^9$ states) or national telephone numbers ($\sim 10^{11}$ states)---unblinded digests are trivial to invert using precomputed rainbow tables or offline dictionary attacks.
+
+\textbf{SecureMatch} resolves this dilemma by delivering an end-to-end, peer-to-peer Private Set Intersection (PSI) framework built upon commutative scalar multiplication on the Koblitz elliptic curve \texttt{secp256k1}. Under the semi-honest (honest-but-curious) adversarial model, SecureMatch guarantees that neither party learns any information regarding records outside the true intersection $I = S_A \cap S_B$, while exchanging only compact 33-byte compressed elliptic curve points.
+
+\section{Cryptographic Architecture \& Formal Guarantees}
+\subsection{Mathematical Formulation}
+Let $E(\mathbb{F}_p)$ denote the elliptic curve \texttt{secp256k1} defined over the prime field $\mathbb{F}_p$ ($p = 2^{256} - 2^{32} - 977$), with base point $G$ of prime order $r \approx 2^{256}$. The protocol employs a deterministic hash-to-curve function $\mathcal{H}_E: \{0,1\}^* \rightarrow E(\mathbb{F}_p)$ implemented via rejection sampling (try-and-increment with modular quadratic residue verification).
+
+\begin{enumerate}
+    \item \textbf{Setup \& Key Generation:} Party $A$ and Party $B$ independently generate secret ephemeral scalars $k_A, k_B \stackrel{\$}{\leftarrow} \mathbb{Z}_r^*$.
+    \item \textbf{Local Blinding (Round 1):} 
+    Party $A$ computes $P_A = \{ k_A \cdot \mathcal{H}_E(x_i) \mid x_i \in S_A \}$ and transmits a randomly shuffled permutation $\pi_A(P_A)$ to Party $B$. 
+    Symmetrically, Party $B$ computes $P_B = \{ k_B \cdot \mathcal{H}_E(y_j) \mid y_j \in S_B \}$ and transmits $\pi_B(P_B)$ to Party $A$.
+    \item \textbf{Cross-Blinding (Round 2):}
+    Upon receipt, Party $A$ multiplies the incoming blinded points by its secret scalar: $T_B = \{ k_A \cdot Q \mid Q \in \pi_B(P_B) \} = \{ (k_A \cdot k_B) \cdot \mathcal{H}_E(y_j) \}$.
+    Party $B$ performs the reciprocal operation: $T_A = \{ k_B \cdot P \mid P \in \pi_A(P_A) \} = \{ (k_B \cdot k_A) \cdot \mathcal{H}_E(x_i) \}$.
+    \item \textbf{Intersection Settlement:}
+    Because scalar multiplication over an abelian elliptic curve group is strictly commutative:
+    \begin{equation}
+        k_A \cdot (k_B \cdot \mathcal{H}_E(x)) = (k_A \cdot k_B) \cdot \mathcal{H}_E(x) = k_B \cdot (k_A \cdot \mathcal{H}_E(x))
+    \end{equation}
+    Both parties independently identify matching records by computing local set equality over the doubly-blinded token sets $T_A$ and $T_B$.
+\end{enumerate}
+
+\subsection{Security Reduction \& Adversarial Model}
+Security holds under the \textbf{Computational Diffie-Hellman (CDH)} assumption and the \textbf{Elliptic Curve Discrete Logarithm Problem (ECDLP)} on \texttt{secp256k1}. Given an intercepted blinded point $k_A \cdot \mathcal{H}_E(x)$, recovering the scalar $k_A$ or the original generator point $\mathcal{H}_E(x)$ requires $O(\sqrt{r}) \approx 2^{128}$ group operations via Pollard's rho algorithm, which is computationally infeasible.
+
+\section{Comparison of Expected vs. Achieved Results}
+Table~\ref{tab:comparison} contrasts the commitments made in the October 21 project proposal against the final implementations delivered in the codebase.
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Dimension / Deliverable} & \textbf{Proposed Milestone} & \textbf{Achieved Result} \\ \midrule
+Protocol Paradigm & Two-party ECDH-PSI & Two-party symmetric ECDH-PSI on \texttt{secp256k1} \\
+Maximum Dataset Scalability & $N = 50{,}000$ records per party & $\mathbf{N = 500{,}000}$ \textbf{records per party (1,000,000 total)} \\
+Schema Customizability & Configurable match patterns & Full CRI normalizer + multi-column composite key builder \\
+Empirical Security Validation & Naive hashing comparison & Hardware-validated 3-hour attack ($1.411 \times 10^9$ points) + GPU crack \\
+User Experience / Demo & Walkthrough / CLI demo & Full interactive Streamlit UI with live P2P audit trails \\
+Transport Channels & In-memory \& raw TCP sockets & Symmetrical in-memory, TCP socket, and web UI integration \\ \bottomrule
+\end{tabular}
+\caption{Comparison of initial proposal commitments against finalized project deliverables.}
+\label{tab:comparison}
+\end{table}
+
+\section{Empirical Evaluation \& Cryptanalytic Findings}
+
+\subsection{Scalability \& Component Profiling}
+Empirical benchmarks confirm strict linear computational complexity $O(N)$ with zero memory cliffs:
+\begin{itemize}
+    \item \textbf{Latency Profile:} 1,000 records evaluate in $< 0.8$\,s; 50,000 records complete in $\approx 35.6$\,s; 500,000 records execute smoothly without exhausting memory buffers.
+    \item \textbf{Computational Bottleneck:} Profiling demonstrates that point scalar multiplication accounts for $\mathbf{> 88\%}$ of total CPU time, hash-to-curve try-and-increment represents $\approx 9\%$, and local set intersection lookups take $< 3\%$.
+    \item \textbf{Network Wire Efficiency:} Unlike Homomorphic Encryption (FHE) or Garbled Circuits which generate megabytes per comparison, SecureMatch transmits strictly a single \textbf{33-byte} compressed SEC1 point per record ($3.3$\,MB per 100,000 records).
+\end{itemize}
+
+\subsection{Empirical Cryptanalysis: The "Just Hash It" Fallacy}
+To quantitatively demonstrate why deterministic hashing fails, we conducted empirical inversion tests contrasting raw SHA-256 with \texttt{secp256k1}:
+\begin{enumerate}
+    \item \textbf{SHA-256 Inversion on Commodity CPU:}
+    \begin{itemize}
+        \item Brazilian CPF (`12345678909`): Cracked in $\mathbf{0.283597}$\,seconds ($56{,}790$ evaluations at $200{,}248$\,hashes/sec).
+        \item Corporate CNPJ (`12345678000195`): Cracked in $\mathbf{0.002910}$\,seconds ($679$ evaluations at $233{,}310$\,hashes/sec).
+    \end{itemize}
+    \item \textbf{Unhinted GPU Exhaustion:}
+    Running a dedicated CUDA kernel on a consumer GPU (NVIDIA GTX 1060), sequential brute-force from $000000000$ to $123456789$ cracked the raw CPF hash in only $\mathbf{0.150726}$\,\textbf{seconds} ($123.4$ million evaluations at $829.31$\,Mhashes/sec).
+    \item \textbf{The 3-Hour \texttt{secp256k1} Exhaustion Attack:}
+    Subjecting intercepted blinded points $P = k \cdot \mathcal{H}_E(x)$ to a continuous 3.0-hour attack evaluated $\mathbf{1{,}411{,}050{,}000}$ scalar point multiplications. 
+    The attack achieved an empirical success rate of $\mathbf{0.000\%}$, exploring merely:
+    \begin{equation}
+        \mathbf{0.00000000000000000000000000000000000000000000000000000000000000000012186\%}
+    \end{equation}
+    of the \texttt{secp256k1} scalar space ($1.2186 \times 10^{-66}\%$, requiring $> 10^{64}$ years for full exhaustion).
+\end{enumerate}
+
+\section{Difficulties Encountered \& Engineering Solutions}
+\begin{enumerate}
+    \item \textbf{Cryptographic Avalanche vs. Real-World Dirty Data:}
+    Because cryptographic hash functions possess an avalanche effect, a single whitespace, hyphen, or casing discrepancy produces completely orthogonal curve points, inducing a 100\% False Negative Rate (FNR). We solved this by developing the \emph{Canonical Record Identifier (CRI)} normalization pipeline, applying deterministic Unicode NFKC decomposition, whitespace collapsing, and regex sanitation prior to the hash-to-curve phase.
+    \item \textbf{Schema Asymmetry in Bilateral Exchanges:}
+    Organizations frequently store composite attributes across different column orders (e.g., Hospital A indexes by `[Phone, State]` while Hospital B stores `[State, Phone]`). We implemented a shareable bilateral schema specification format (JSON) allowing parties to agree on explicit key ordering and normalization rules beforehand.
+    \item \textbf{Python GIL \& Scalar Multiplication Overhead:}
+    Scalar point multiplication on large sets ($N \ge 100{,}000$) is computationally intensive in pure Python. While our single-threaded implementation verified strict $O(N)$ asymptotic linearity, batch SIMD or GPU offloading represents a natural architectural extension for multi-million-record enterprise deployments.
+\end{enumerate}
+
+\section{Deviations from Original Plan}
+The project followed all primary milestones set in the proposal, with two notable enhancements:
+\begin{itemize}
+    \item \textbf{Primitive Standardization on \texttt{secp256k1}:} While the proposal planned a parallel comparison between \texttt{secp256k1} and \texttt{Curve25519}, we concentrated implementation depth on \texttt{secp256k1} to leverage standardized 33-byte SEC1 compressed coordinate encoding and native compatibility with well-audited cryptographic libraries.
+    \item \textbf{Development of an Interactive Visual Audit Interface:} Rather than delivering only a command-line script, we developed a production-ready Streamlit application featuring a dual-organization simulator, step-by-step cryptographic audit trails, and interactive benchmark dashboards.
+\end{itemize}
+
+\section{Conclusion}
+SecureMatch demonstrates that mathematically sound Private Set Intersection based on commutative elliptic curves is thoroughly viable on commodity computing hardware, scaling up to 500,000 records per organization with strict $O(N)$ computational complexity and minimal network footprint ($33$ bytes/record). It successfully eliminates the severe vulnerabilities of deterministic hashing, offering an accessible, LGPD-compliant pathway for cross-organizational data collaboration.
+
+\end{document}
